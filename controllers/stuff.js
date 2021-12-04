@@ -18,18 +18,27 @@ exports.getThing = (req, res, next) => {
 
 exports.getAllThings = (req, res, next) => {
   Thing.find()
-  .then(things => res.status(200).json(things))
-  .catch(error => res.status(400).json({ error }));
+    .then(things => res.status(200).json(things))
+    .catch(error => res.status(400).json({ error }));
 };
 
 exports.modifyThing = (req, res, next) => {
   Thing.updateOne({_id: req.params.id}, {...req.body, _id: req.params.id})
-      .then(() => res.status(200).json({ message: 'Object updated' }))
-      .catch(error => res.status(400).json({ error }));
+    .then(() => res.status(200).json({ message: 'Object updated' }))
+    .catch(error => res.status(400).json({ error }));
 };
 
 exports.deleteThing = (req, res, next) => {
-  Thing.deleteOne({_id: req.params.id})
-  .then(() => res.status(200).json({ message: 'Object deleted' }))
-  .catch(error => res.status(400).json({ error }));
-};
+  Thing.findOne({_id: req.params.id})
+    .then(
+      (thing) => {
+        if(!thing) {
+          return res.status(404).json({error: new Error('Object not found !')});
+        }
+        if(thing.userId !== req.auth.userId){
+          return res.status(401).json({error: new Error('Unauthorized request !')});
+        }
+        Thing.deleteOne({_id: req.params.id}).then(() => {res.status(200).json({ message: 'Object deleted' })});
+    })
+    .catch((error) => {res.status(400).json({error: error })})
+    }
