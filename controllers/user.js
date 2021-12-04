@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
 
+const tokenKey = require('../config').dev.tokenKey;
+
 exports.signup = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
     .then(hash => {
@@ -33,7 +35,7 @@ exports.login = (req, res, next) => {
                 userId: user._id,
                 token: jwt.sign(
                   { userId: user._id},
-                  'Random_token_secret',
+                  tokenKey,
                   { expiresIn: '24h'}
                 )
               });

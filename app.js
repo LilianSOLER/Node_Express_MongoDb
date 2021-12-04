@@ -4,14 +4,15 @@ const mongoose = require('mongoose');
 const stuffRoutes = require('./routes/stuff');
 const userRoutes = require('./routes/user');
 
-const urlDb = require('./configdb');
+const confDbMg = require('./config').dev.database.mongodb;
 
 const app = express();
 
 mongoose
-  .connect(urlDb, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Connected to database'))
-  .catch(() => console.log('Connection failed'));
+  .connect(`mongodb+srv://${confDbMg.user}:${confDbMg.password}@${confDbMg.host}/${confDbMg.db}?retryWrites=true&w=majority`,
+  { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log('Connected to database'))
+    .catch(() => console.log('Connection failed'));
 
 app.use(express.json());
 
